@@ -1,0 +1,2 @@
+# Obsidian
+Workplace Management Dashboard
