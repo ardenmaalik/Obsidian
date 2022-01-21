@@ -1,6 +1,11 @@
 import React from "react";
 import styled from "styled-components";
-import SidebarOption from './SidebarOption'
+import SidebarOption from "./SidebarOption";
+import { getFirestore, collection } from "firebase/firestore";
+import { firebaseApp } from "../firebase";
+import { useCollection } from "react-firebase-hooks/firestore";
+import { useAuthState } from "react-firebase-hooks/auth";
+import {auth} from '../firebase'
 
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import CreateIcon from "@mui/icons-material/Create";
@@ -16,6 +21,10 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AddIcon from "@mui/icons-material/Add";
 
 function Sidebar() {
+	const [channels, loading, error] = useCollection(
+		collection(getFirestore(firebaseApp), "rooms")
+	);
+	const [user] = useAuthState(auth);
 	return (
 		<SidebarContainer>
 			<SidebarHeader>
@@ -41,6 +50,10 @@ function Sidebar() {
 			<SidebarOption Icon={ExpandMoreIcon} title='Channels' />
 			<hr />
 			<SidebarOption Icon={AddIcon} addChannelOption title='Add Channel' />
+
+			{channels?.docs.map((doc) => (
+				<SidebarOption key={doc.id} id={doc.id} title={doc.data().name} />
+			))}
 		</SidebarContainer>
 	);
 }
@@ -55,45 +68,46 @@ const SidebarContainer = styled.div`
 	max-width: 260px;
 	margin-top: 60px;
 
-    > hr {
-        margin-top: 10px;
-        margin-bottom: 10px;
-        border: 1px solid #49274b;
-    }
+	> hr {
+		margin-top: 10px;
+		margin-bottom: 10px;
+		border: 1px solid #49274b;
+	}
 `;
+
 const SidebarHeader = styled.div`
 	display: flex;
 	border-bottom: 1px solid #49274b;
 	padding: 13px;
 
-    > .MuiSvgIcon-root {
-        padding: 8px;
-        color: #49274b;
-        font-size: 18px;
-        background-color: #FFF;
-        border-radius: 999px;
-    }
+	> .MuiSvgIcon-root {
+		padding: 8px;
+		color: #49274b;
+		font-size: 18px;
+		background-color: #fff;
+		border-radius: 999px;
+	}
 `;
 const SidebarInfo = styled.div`
-flex:1px solid #49274b;
+    flex: 1;
 
-> h2 {
-    font-size: 15px;
-    font-weight: 900;
-    margin-bottom: 5px;
-}
+    > h2 {
+        font-size: 15px;
+        font-weight: 900;
+        margin-bottom: 5px;
+    }
 
-> h3 {
-    display: flex;
-    font-size: 13px;
-    font-weight: 400;
-    align-items
-}
+    > h3 {
+        display: flex;
+        font-size: 13px;
+        font-weight: 400;
+        align-items
+    }
 
-> h3 > .MuiSvgIcon-root {
-    font-size: 14px;
-    margin-top: 1px;
-    margin-right: 2px;
-    color: green;
-}
+    > h3 > .MuiSvgIcon-root {
+        font-size: 14px;
+        margin-top: 1px;
+        margin-right: 2px;
+        color: green;
+    }
 `;
