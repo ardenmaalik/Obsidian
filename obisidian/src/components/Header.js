@@ -1,17 +1,23 @@
 import React from "react";
 import styled from "styled-components";
+
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "../firebase";
+import { signOut } from "firebase/auth";
 import { Avatar } from "@mui/material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import SearchIcon from "@mui/icons-material/Search";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 
 const Header = () => {
+	const [user] = useAuthState(auth);
 	return (
 		<HeaderContainer>
 			<HeaderLeft>
 				<HeaderAvatar
-				//Add OnClick
-				//Add User Img
+					onClick={() => signOut(auth)}
+					src={user?.photoURL}
+					alt={user?.displayName}
 				/>
 				<AccessTimeIcon />
 			</HeaderLeft>
@@ -22,7 +28,7 @@ const Header = () => {
 			</HeaderSearch>
 			{/* Header right*/}
 			<HeaderRight>
-				<HelpOutlineIcon/>
+				<HelpOutlineIcon />
 			</HeaderRight>
 		</HeaderContainer>
 	);
@@ -62,7 +68,7 @@ const HeaderRight = styled.div`
 		margin-left: auto;
 		margin-right: 20px;
 	}
-`
+`;
 
 const HeaderSearch = styled.div`
 	flex: 0.4;
