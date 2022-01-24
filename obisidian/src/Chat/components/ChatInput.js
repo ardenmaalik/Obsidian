@@ -4,7 +4,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 
 import { Button } from "@mui/material";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { auth, db } from "../firebase";
+import { auth, db } from "../../firebase";
 
 const ChatInput = ({ chatRef, channelName, channelId }) => {
 	const [input, setInput] = useState("");

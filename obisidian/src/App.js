@@ -4,10 +4,12 @@ import "./App.css";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import styled from "styled-components";
 
-import Header from "./components/Header";
-import Sidebar from "./components/Sidebar";
-import Chat from "./components/Chat";
-import Login from "./components/Login";
+import Header from "./Interface/components/Header";
+import Sidebar from "./Interface/components/Sidebar";
+import Homepage from "./Tasks/components/Homepage";
+import Chat from "./Chat/components/Chat";
+import MyTasks from "./Tasks/components/MyTasks";
+import Login from "./Chat/components/Login";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "./firebase";
 import Spinner from "react-spinkit";
@@ -39,9 +41,13 @@ function App() {
 							<Sidebar />
 							<Switch>
 								<Route exact path='/'>
-									<Chat />
+									<Homepage />
+								</Route>
+								<Route exact path='/my-tasks'>
+									<MyTasks />
 								</Route>
 							</Switch>
+							<Chat />
 						</AppBody>
 					</>
 				)}
@@ -58,10 +64,10 @@ const AppBody = styled.div`
 `;
 
 const AppLoading = styled.div`
-  display: grid;
-  place-items: center;
-  height: 100vh;
-  width: 100%;
+	display: grid;
+	place-items: center;
+	height: 100vh;
+	width: 100%;
 `;
 const AppLoadingContents = styled.div`
 	text-align: center;

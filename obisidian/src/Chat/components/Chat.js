@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
-import { selectRoomId } from "../features/appSlice";
+import { selectRoomId } from "../../features/appSlice";
 import ChatInput from "./ChatInput";
 import { useCollection, useDocument } from "react-firebase-hooks/firestore";
-import { db } from "../firebase";
+import { db } from "../../firebase";
 import { doc, collection, query, orderBy } from "firebase/firestore";
 
 import Message from "./Message";

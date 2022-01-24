@@ -2,10 +2,10 @@ import React from "react";
 import styled from "styled-components";
 import SidebarOption from "./SidebarOption";
 import { getFirestore, collection } from "firebase/firestore";
-import { firebaseApp } from "../firebase";
+import { firebaseApp } from "../../firebase";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
-import {auth} from '../firebase'
+import {auth} from '../../firebase'
 
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import CreateIcon from "@mui/icons-material/Create";
@@ -41,7 +41,7 @@ function Sidebar() {
 			<SidebarOption Icon={InsertCommentIcon} title='Threads' />
 			<SidebarOption Icon={InboxIcon} title='Mentions & reactions' />
 			<SidebarOption Icon={DraftsIcon} title='Saved items' />
-			<SidebarOption Icon={BookmarkBorderIcon} title='Channel browser' />
+			<SidebarOption Icon={BookmarkBorderIcon} title='My Tasks' />
 			<SidebarOption Icon={PeopleAltIcon} title='People & user groups' />
 			<SidebarOption Icon={AppsIcon} title='Apps' />
 			<SidebarOption Icon={FileCopyIcon} title='File browser' />
