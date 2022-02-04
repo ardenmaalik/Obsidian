@@ -1,16 +1,22 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useTable, useFlexLayout, useResizeColumns } from "react-table";
+import {useSelector} from 'react-redux'
 import MOCK_DATA from "./MOCK_DATA.json";
 import { COLUMNS } from "./columns";
 import styled from "styled-components";
-import DataCell from "./DataCell";
 import DataHeader from "./DataHeader";
 
-import { sortAssignee } from "./Sort";
+import { selectAddTask } from '../../features/appSlice'
+
 
 const Table = () => {
-	const [isEditing, setIsEditing] = useState([]);
+	const [isEditing, setIsEditing] = useState("");
 	const [isSorted, setIsSorted] = useState(false);
+
+    const taskInput = useSelector(selectAddTask)
+
+    useEffect(() => {
+        console.log('Task state: ', taskInput)
+    })
 
 	const NO_DATA = [
 		{
@@ -23,7 +29,8 @@ const Table = () => {
 		},
 	];
 
-	const columns = useMemo(() => COLUMNS, []);
+    const columns = useMemo(() => COLUMNS, []);
+    
 	const data = useMemo(() => {
 		let sortedData = [...MOCK_DATA];
 
@@ -36,42 +43,21 @@ const Table = () => {
 				sortedData.sort((a, b) =>
 					a.task_name < b.task_name ? -1 : a.task_name > b.task_name ? 1 : 0
 				);
-			} else if (isSorted == 'due_date') {
-				sortedData.sort((a, b) =>
-					new Date(a.due_date).getTime() - new Date(b.due_date).getTime()
+			} else if (isSorted == "due_date") {
+				sortedData.sort(
+					(a, b) =>
+						new Date(a.due_date).getTime() - new Date(b.due_date).getTime()
 				);
 			}
 		}
-
-		console.log("sorted...", sortedData);
 		return sortedData;
 	}, [isSorted]);
-
-	useEffect(() => {
-		console.log("Sorted?: ", isSorted);
-	});
-
-	const handleOnClick = (e, i) => {
-		const rowId = Number(e.currentTarget.parentNode.getAttribute("id"));
-		setIsEditing([rowId, i]);
-	};
-
-	const handleInput = (e, i) => {
-		handleOnClick();
-
-		console.log();
-	};
-
-	const handleRowId = (e, i) => {
-		console.log("Row ID: ", e, i);
-	};
 
 	const handleKeyPress = (e) => {
 		console.log(e.keyCode);
 		e.keyCode == 13 && setIsEditing(null);
 	};
 
-	const renderData = () => {};
 
 	const columnWidth = (key) => {
 		const colWidth = COLUMNS.map((column) => {
@@ -87,9 +73,6 @@ const Table = () => {
 		return filteredColWidth;
 	};
 
-	const sortData = (field) => {
-		console.log(field, " has been clicked!");
-	};
 
 	return (
 		<DataContainer>
@@ -106,17 +89,37 @@ const Table = () => {
 			</DataHeaderContainer>
 			<DataRowContainer>
 				{data.map((row, i) => (
-					<DataRow key={i} id={i} className = 'data-row'>
-						{Object.entries(row).map(
+                    <DataRow key={i} id={i}>
+						{Object.entries(row, i).map(
 							([key, val]) =>
 								key !== "id" && (
 									<DataCell
-										columns={COLUMNS}
-										key={key}
-										val={val}
-										index={i}
+										id={i}
 										columnWidth={columnWidth(key)}
-									/>
+										isHoverable={isEditing === i && key === 'task_name' ? false : true}
+									>
+										{key === "task_name" ? (
+											<DataInput
+												id={i}
+												onClick={(e) => {
+													setIsEditing(i)
+												}}
+                                                isActive={isEditing === i ? true : false}
+                                                inputVal={val}
+
+											>
+												<input
+													readOnly={isEditing === i ? false : true}
+													type='text'
+													defaultValue={val}
+												/>
+											</DataInput>
+                                        ) : (
+                                            <DataValue>
+                                                {val}
+                                            </DataValue>
+										)}
+									</DataCell>
 								)
 						)}
 					</DataRow>
@@ -131,6 +134,7 @@ export default Table;
 const DataContainer = styled.div`
 	display: grid;
 	width: 100%;
+	border-top: 1px solid #ddd;
 	grid-template-columns:
 		350px
 		150px
@@ -140,14 +144,14 @@ const DataContainer = styled.div`
 
 const DataHeaderContainer = styled.div`
 	display: contents;
-    cursor: pointer;
+	cursor: pointer;
 `;
 
 const DataRowContainer = styled.div`
 	display: contents;
 	cursor: pointer;
 
-	> .data-row {
+	.data-row {
 		background-color: #000;
 	}
 `;
@@ -157,5 +161,35 @@ const DataRow = styled.div`
 	height: 30px;
 	align-items: center;
 	font-size: 12px;
-    background-color: green;
+	background-color: green;
 `;
+
+const DataCell = styled.div`
+	padding-top: 10px;
+	padding-bottom: 10px;
+	color: #808080;
+	padding: 10px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	/* width: ${(props) => (props.columnWidth ? props.columnWidth : "100%")}; */
+	/* border: ${(props) => (props.isActive ? "1px solid blue" : "none")}; */
+
+	:hover {
+		background-color: ${(props) => (props.isHoverable ? "#ddd" : "")};
+		border: ${(props) => (props.isHoverable ? "1px solid #000" : "none")};
+	}
+`;
+
+const DataValue = styled.div`
+
+`
+
+const DataInput = styled.div`
+	input {
+		border: none;
+		outline: none;
+        width: ${({ isActive }) => isActive && '98%'};
+        /* background-color: blue; */
+	}
+    `
