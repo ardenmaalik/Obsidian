@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
-import {useDispatch} from 'react-redux'
+import { useDispatch } from "react-redux";
 import styled from "styled-components";
-import { addTask } from "../../features/appSlice";
+import { displayAddTask } from "../../features/appSlice";
 
 import CaretDown from "@mui/icons-material/KeyboardArrowDown";
 import AddIcon from "@mui/icons-material/Add";
 
 const AddTaskButton = () => {
-    const [displayList, setDisplayList] = useState(null);
-    
-    const dispatch = useDispatch()
+	const [displayList, setDisplayList] = useState(null);
+
+	const dispatch = useDispatch();
 
 	useEffect(() => {
 		document.addEventListener("click", handleClickOutside, true);
@@ -23,16 +23,17 @@ const AddTaskButton = () => {
 		setDisplayList(false);
 	};
 
-    const handleAddTask = () => {
-        dispatch(addTask({
-            taskInput: true,
-        }))
-    };
-    
+	const handleDisplayAddTask = () => {
+		dispatch(
+			displayAddTask({
+                displayInput: true,
+			})
+		);
+	};
 
 	return (
 		<AddTaskButtonContainer>
-			<AddTaskBtn onClick={handleAddTask}>
+			<AddTaskBtn onClick={handleDisplayAddTask}>
 				<AddIcon />
 				<span>Add Task</span>
 			</AddTaskBtn>
