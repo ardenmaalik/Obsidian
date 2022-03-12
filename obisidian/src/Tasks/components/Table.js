@@ -1,90 +1,79 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import MOCK_DATA from "./MOCK_DATA.json";
-import { COLUMNS } from "./columns";
 import styled from "styled-components";
 import DataHeader from "./DataHeader";
-import { displayAddTask } from "../../features/appSlice";
+import DataCell from "./DataCell";
+
 // import DataCell from './DataCell';
 
 import { selectAddTask } from "../../features/appSlice";
 
-const Table = () => {
-	const [isEditing, setIsEditing] = useState("");
-	const [selected, setSelected] = useState("");
-	const [isSorted, setIsSorted] = useState(false);
-	const [inputHover, setInputHover] = useState(null);
-	const [dataState, setDataState] = useState([...MOCK_DATA]);
-	const [test, setTest] = useState("");
+const Table = ({
+	data,
+	dataState,
+	setDataState,
+	columns,
+	sortData,
+	isSorted,
+	setIsSorted,
+	displayNewTask,
+	setDisplayNewTask,
+}) => {
+	const [isRowSelected, setIsRowSelected] = useState("");
+	const [isSelected, setIsSelected] = useState({ index: null, field: "" });
+	const [editDate, setEditDate] = useState(false);
+	const [assigneeInput, showAssigneeInput] = useState(false);
 
-	const displayInput = useSelector(selectAddTask);
-	const dispatch = useDispatch();
-
-	const NO_DATA = [
-		{
-			task_name: "Click here to add task...",
-			first_name: "Ravid",
-			last_name: "Port",
-			email: "rport0@narod.ru",
-			date_of_birth: "1976-03-02T02:27:46Z",
-			Age: 34,
-		},
-	];
-
-	const columns = useMemo(() => COLUMNS, []);
-
-	const data = useMemo(() => {
-		let sortedData = [...dataState];
-
-		if (isSorted) {
-			if (isSorted === "assignee") {
-				sortedData.sort((a, b) =>
-					a.assignee < b.assignee ? -1 : a.assignee > b.assignee ? 1 : 0
-				);
-			} else if (isSorted === "task_name") {
-				sortedData.sort((a, b) =>
-					a.task_name < b.task_name ? -1 : a.task_name > b.task_name ? 1 : 0
-				);
-			} else if (isSorted === "due_date") {
-				sortedData.sort(
-					(a, b) =>
-						new Date(a.due_date).getTime() - new Date(b.due_date).getTime()
-				);
-			}
-		}
-		return sortedData;
-	}, [isSorted, dataState]);
+	const dataRef = useRef();
 
 	useEffect(() => {
-		// const updatedData = dataState
+		console.log();
+		if (displayNewTask) {
+			addEmptyTaskValue();
+		} else {
+			return null;
+		}
+	}, [displayNewTask]);
 
+	useEffect(() => {
+		document.addEventListener("click", handleClickOutside);
+		return () => {
+			document.removeEventListener("click", handleClickOutside);
+		};
+	});
+
+	const handleClickOutside = (e) => {
+		if (displayNewTask) {
+			if (
+				e.target.parentNode !==
+					dataRef.current.children[1].children[0].children[0] ||
+				!dataRef.current.children[1].children[0].contains(e.target.parentNode)//Fix this line
+			) {
+				const dataMap = [...dataState];
+				const filteredData = dataMap.filter((item) => item.task_name !== "");
+
+				setDataState([...filteredData]);
+				setDisplayNewTask(false);
+			}
+		}
+
+		// console.log("Filtered: ", filteredData);
+	};
+
+	const addEmptyTaskValue = () => {
 		const newValue = {
 			id: 0,
-			task_name: '',
-			assignee: null,
-			due_date: null,
+			task_name: "",
+			assignee: "",
+			due_date: "01/01/2001",
 			field: null,
 		};
 
-		if (displayInput) {
-            setDataState((prevState) => [newValue, ...prevState]);
-            setIsEditing(0)
-		}
-
-		// console.log("data State: ", dataState);
-	}, [displayInput]);
-
-	useEffect(() => {
-		console.log(dataState);
-	}, [dataState]);
-
-	const handleKeyPress = (e) => {
-		console.log(e.keyCode);
-		e.keyCode == 13 && setIsEditing(null);
+		setDataState((prevState) => [newValue, ...prevState]);
 	};
 
 	const columnWidth = (key) => {
-		const colWidth = COLUMNS.map((column) => {
+		const colWidth = columns.map((column) => {
 			if (key === column.field) {
 				return column.width;
 			}
@@ -97,95 +86,56 @@ const Table = () => {
 		return filteredColWidth;
 	};
 
-	useEffect(() => {
-		console.log("select: ", selected, isEditing);
-	}, [selected]);
-
-    const handleInputOnChange = (e, index) => {
-        e.preventDefault()
-        const dataTable = [...dataState];
-        // dataTable[index].task_name = e.target.value;
-        setDataState(
-            dataTable.map((data, data_index) =>
-                data_index === index ? { ...data, task_name: e.target.value } : data
-            )
-        );
-        // setInput([...MOCK_DATA])
-    };
-
-    const handleOnClick = (index) => {
-        setIsEditing(index);
-        setSelected(index)
-
-    }
+	const handleRowOnClick = (index) => {
+		setIsRowSelected(index);
+	};
 
 	return (
-		<DataContainer>
+		<DataContainer ref={dataRef}>
 			<DataHeaderContainer>
-				{COLUMNS.map((header, i) => (
+				{columns.map((header, i) => (
 					<DataHeader
 						headerWidth={header.width}
 						header={header}
 						index={i}
 						isSorted={isSorted}
 						setIsSorted={setIsSorted}
+						sortData={sortData}
 					/>
 				))}
 			</DataHeaderContainer>
-			<DataRowContainer>
+			<>
 				{data.map((row, index) => (
-					<DataRow key={index} id={index}>
+					<DataRow
+						id={`${"row_" + index}`}
+						selectedRow={isRowSelected === index ? true : false}
+						onClick={(e) => handleRowOnClick(index)}
+					>
 						{Object.entries(row, index).map(
 							([key, val]) =>
 								key !== "id" && (
-									// <DataCell id={index} index={index} cellVal={val} dataKey={key} columnWidth={columnWidth}/>
 									<DataCell
-										id={index}
+										field={key}
+										val={val}
+										index={index}
+										dataState={dataState}
+										setDataState={setDataState}
 										columnWidth={columnWidth(key)}
-										isHoverable={
-											isEditing === index && key === "task_name" ? false : true
-										}
-										cellVal={val}
-										selected={selected === index ? true : false}
-									>
-										{key === "task_name" ? (
-											<DataInput
-												id={index}
-												isActive={isEditing === index ? true : false}
-												onClick={() => {
-													handleOnClick(index);
-												}}
-											>
-												<input
-													readOnly={false}
-													name={key}
-													type='text'
-													value={dataState[index].task_name}
-													onChange={(e) => handleInputOnChange(e, index)}
-													placeholder={
-														isEditing === 0 ? "Write a task name" : false
-													}
-												/>
-											</DataInput>
-										) : (
-											<DataValue
-												cellVal={val}
-												onMouseEnter={() => {
-													setInputHover(index);
-												}}
-												onMouseLeave={() => {
-													setInputHover(null);
-												}}
-											>
-												<span>{val}</span>
-											</DataValue>
-										)}
-									</DataCell>
+										setIsSelected={setIsSelected}
+										isSelected={isSelected}
+										displayNewTask={displayNewTask}
+										setDisplayNewTask={setDisplayNewTask}
+										handleClickOutside={handleClickOutside}
+										editDate={editDate}
+										setEditDate={setEditDate}
+										assigneeInput={assigneeInput}
+										showAssigneeInput={showAssigneeInput}
+									/>
 								)
 						)}
 					</DataRow>
 				))}
-			</DataRowContainer>
+			</>
 		</DataContainer>
 	);
 };
@@ -203,57 +153,25 @@ const DataContainer = styled.div`
 		minmax(150px, 1.67fr);
 `;
 
-const DataHeaderContainer = styled.div`
-	display: contents;
-	cursor: pointer;
-`;
-
-const DataRowContainer = styled.div`
-	display: contents;
-	cursor: pointer;
-
-	.data-row {
-		background-color: #000;
-	}
-`;
-
 const DataRow = styled.div`
 	display: contents;
 	height: 30px;
 	align-items: center;
 	font-size: 12px;
-	background-color: green;
-`;
+	cursor: pointer;
 
-const DataCell = styled.div`
-	padding-top: 10px;
-	padding-bottom: 10px;
-	color: #808080;
-	padding: 10px;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	/* width: ${(props) => (props.columnWidth ? props.columnWidth : "100%")}; */
-	border: ${(props) => (props.isActive ? "1px solid blue" : "none")};
-    background-color: ${({ selected }) => selected ? '#ADD8E6' : "#FFF"};
-    
-	:hover {
-		background-color: ${(props) => (props.isHoverable ? "#F5F5F5" : "")};
-		border: ${(props) => (props.isHoverable ? "1px solid #000" : "none")};
+	> div {
+		background-color: ${({ selectedRow }) =>
+			selectedRow ? "#ADD8E6" : "white"};
+	}
+
+	:hover div {
+		background-color: ${({ selectedRow }) =>
+			selectedRow ? "none" : "#F5F5F5"};
 	}
 `;
 
-const DataValue = styled.div``;
-
-const DataInput = styled.div`
-	input {
-		border: none;
-		outline: none;
-		/* width: ${({ isActive }) => isActive && "98%"}; */
-		/* background-color: blue; */
-		font-size: 12px;
-		color: #808080;
-	}
-
-    
+const DataHeaderContainer = styled.div`
+	display: contents;
+	cursor: pointer;
 `;

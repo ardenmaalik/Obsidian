@@ -6,7 +6,7 @@ import { displayAddTask } from "../../features/appSlice";
 import CaretDown from "@mui/icons-material/KeyboardArrowDown";
 import AddIcon from "@mui/icons-material/Add";
 
-const AddTaskButton = () => {
+const AddTaskButton = ({setDisplayNewTask}) => {
 	const [displayList, setDisplayList] = useState(null);
 
 	const dispatch = useDispatch();
@@ -23,17 +23,11 @@ const AddTaskButton = () => {
 		setDisplayList(false);
 	};
 
-	const handleDisplayAddTask = () => {
-		dispatch(
-			displayAddTask({
-                displayInput: true,
-			})
-		);
-	};
+
 
 	return (
 		<AddTaskButtonContainer>
-			<AddTaskBtn onClick={handleDisplayAddTask}>
+            <AddTaskBtn onClick={() => setDisplayNewTask(true)}>
 				<AddIcon />
 				<span>Add Task</span>
 			</AddTaskBtn>

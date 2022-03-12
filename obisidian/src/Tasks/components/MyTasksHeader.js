@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 
 import AddTaskButton from "./AddTaskButton";
@@ -7,8 +7,21 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import StarBorderOutlinedIcon from "@mui/icons-material/StarBorderOutlined";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 
-const MyTasksHeader = () => {
-	const [displayTaskInput, setDisplayTaskInput] = useState(null);
+const MyTasksHeader = ({sortData, displayNewTask, setDisplayNewTask}) => {
+	const [displayDropdown, setDisplayDropdown] = useState(null);
+
+	useEffect(() => {
+		document.addEventListener("click", handleClickOutside, true);
+
+		return () => {
+			document.removeEventListener("click", handleClickOutside, true);
+		};
+	});
+
+	const handleClickOutside = () => {
+		setDisplayDropdown(false);
+	};
+
 	return (
 		<MyTasksHeaderContainer>
 			<Header>
@@ -24,14 +37,26 @@ const MyTasksHeader = () => {
 			<SubHeaderContainer>
 				<SubHeaderLeft>
 					<AddTaskButton
-						displayTaskInput={displayTaskInput}
-						setDisplayTaskInput={setDisplayTaskInput}
+						displayNewTask={displayNewTask}
+						setDisplayNewTask={setDisplayNewTask}
 					/>
 				</SubHeaderLeft>
 				<SubHeaderRight>
 					<p>All tasks</p>
 					<p>Filter</p>
-					<p>Sort</p>
+					<SortButtonContainer
+						className='sort'
+						onClick={() => setDisplayDropdown("sort")}
+					>
+						<p>Sort</p>
+						<SortDropdownContent Display={displayDropdown === 'sort' ? true : false}>
+							<ul>
+								<SortNone onClick={() => sortData('None') }><li>None</li></SortNone>
+								<SortDueDate onClick={() => sortData('due_date')}><li>Due Date</li></SortDueDate>
+								<SortAssignee onClick={() => sortData('assignee')}><li>Assignee</li></SortAssignee>
+							</ul>
+						</SortDropdownContent>
+					</SortButtonContainer>
 					<p>Customize</p>
 					<p>Create Link</p>
 					<p>More...</p>
@@ -45,7 +70,7 @@ export default MyTasksHeader;
 
 const Header = styled.div`
 	padding: 1em;
-`
+`;
 
 const MyTasksHeaderContainer = styled.div`
 	display: flex;
@@ -99,3 +124,42 @@ const HeaderLeft = styled.div`
 		color: #90949c;
 	}
 `;
+
+const SortButtonContainer = styled.div`
+	margin-right: 1em;
+	cursor: pointer;
+`;
+const SortDropdownContent = styled.div`
+	position: absolute;
+	display: ${({ Display }) => (Display ? "flex" : "none")};
+	flex-direction: column;
+	background-color: #fff;
+	width: 200px;
+	height: auto;
+	border: 0.1em solid lightgray;
+	border-radius: 5px;
+	z-index: 1;
+	margin-top: 0.2em;
+
+	ul {
+		text-decoration: none;
+		list-style-type: none;
+		margin: 0;
+		padding: 0;
+	}
+	li {
+		font-size: 14px;
+		cursor: pointer;
+		width: 100%;
+		padding: 0.5em;
+	}
+
+	li:hover {
+		background-color: lightgray;
+		width: auto;
+	}
+`;
+
+const SortDueDate = styled.div``
+const SortAssignee = styled.div``
+const SortNone = styled.div``

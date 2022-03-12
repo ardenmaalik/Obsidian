@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 
-function DataHeader({ header, index, headerWidth, isSorted, setIsSorted }) {
+function DataHeader({ header, index, headerWidth, isSorted, setIsSorted, sortData }) {
 
     const handleSorting = (field) => {
         if (isSorted !== field) {
@@ -11,8 +11,9 @@ function DataHeader({ header, index, headerWidth, isSorted, setIsSorted }) {
         }
     }
 
+  
 	return (
-        <HeaderContainer headerWidth={headerWidth} key={index} onClick={() => handleSorting(header.field) }>
+        <HeaderContainer headerWidth={headerWidth} key={index} sorted={() => setIsSorted(header.field)} onClick={() => sortData(header.field) }>
 			{header.headerName}
 			<span className='resizer'></span>
 		</HeaderContainer>
@@ -32,7 +33,7 @@ const HeaderContainer = styled.div`
     font-weight: 600;
 
     :hover {
-        background-color: #ddd;
+        background-color: #F5F5F5;
     }
     
 `;
