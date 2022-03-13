@@ -1,4 +1,20 @@
 import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { selectProjectId, openProject } from "../../features/appSlice";
+import {
+	getFirestore,
+	query,
+	addDoc,
+	getDocs,
+	collection,
+	onSnapshot,
+} from "firebase/firestore";
+import { db } from "../../firebase";
+
+import { firebaseApp } from "../../firebase";
+import { useCollection } from "react-firebase-hooks/firestore";
+
+import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { useForm } from "react-hook-form";
 import AddTaskIcon from "@mui/icons-material/AddTask";
@@ -10,6 +26,15 @@ const NewProjectForm = ({ activeModal }) => {
 	const [hide, setHide] = useState(false);
 	const [activeTab, setActiveTab] = useState("");
 	const [inputval, setInputval] = useState("");
+	const [projectCreated, setProjectCreated] = useState(false);
+	const [projectData, setProjectData] = useState("");
+	const [projects] = useCollection(
+		collection(getFirestore(firebaseApp), "projects")
+	);
+	const projectId = useSelector(selectProjectId);
+
+	let history = useHistory();
+	let dispatch = useDispatch();
 
 	const {
 		register,
@@ -18,23 +43,66 @@ const NewProjectForm = ({ activeModal }) => {
 		formState: { errors },
 	} = useForm();
 
+	//Change how this is invoked
 	const onSubmit = (data) => {
 		console.log(data);
+		setProjectData(data);
 		setHide(true);
 	};
+
+	useEffect(() => {
+		if (projectCreated) {
+			history.push(`/${projectId}/project/${projectData.projectName}`);
+		}
+		setProjectCreated(false)
+	}, [projectCreated]);
 
 	useEffect(() => {
 		activeModal && setDisplay(true);
 	}, [activeModal]);
 
-    const handleGoToProject = () => {
-        console.log(`Go to ${activeTab}`)
-    };
+	const addProject = async () => {
+		console.log('adding project...')
+		const projectName = projectData.projectName;
+		if (projectName) {
+			try {
+				//await til this is finished
+				await addDoc(collection(db, "projects"), {
+					name: projectName,
+				});
+			} catch (e) {
+				console.error("Error adding project: ", e);
+			}
+		}
+	};
 
-	console.log("Active tab:", activeTab);
-	console.log("Input Value:", inputval);
+	const createProject = async () => {
+		await addProject();
+		await getProjectId();
+		setProjectCreated(true)
+	};
 
-	// console.log(watch("example"));
+	const getProjectId = async () => {
+		console.log('getting project id...')
+		const q = query(collection(db, "projects"));
+		const queryProjects = await getDocs(q);
+
+		await queryProjects.forEach((doc) => {
+			if (doc.data().name === projectData.projectName)
+				dispatch(
+					openProject({
+						projectId: doc.id,
+						projectName: projectData.projectName
+					})
+				);
+		});
+	};
+
+	const handleGoToProject = async () => {
+		if (activeTab === "add-task") {
+			createProject();
+		}
+	};
 
 	return (
 		<NewProjectFormContainer display={display}>
@@ -116,7 +184,7 @@ const NewProjectForm = ({ activeModal }) => {
 						type='submit'
 						value='Go to Project'
 						onClick={handleGoToProject}
-					/>
+						/>
 				</OptionsContainer>
 			)}
 		</NewProjectFormContainer>

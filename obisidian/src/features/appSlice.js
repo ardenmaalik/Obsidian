@@ -1,6 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
+	projectId: null,
+	projectName: null,
 	roomId: null,
 	displayInput: null,
 };
@@ -16,6 +18,10 @@ export const appSlice = createSlice({
 	reducers: {
 		enterRoom: (state, action) => {
 			state.roomId = action.payload.roomId;
+		},
+		openProject: (state, action) => {
+			state.projectId = action.payload.projectId;
+			state.projectName = action.payload.projectName;
 		},
 		displayAddTask: (state, action) => {
 			console.log('ACTION: ', action)
@@ -33,10 +39,12 @@ export const appSlice = createSlice({
 // 	},
 // });
 
-export const { enterRoom } = appSlice.actions;
+export const { enterRoom, openProject } = appSlice.actions;
 export const { displayAddTask } = appSlice.actions;
 
 export const selectRoomId = (state) => state.app.roomId;
+export const selectProjectId = (state) => state.app.projectId;
+export const selectProjectName = (state) => state.app.projectName;
 export const selectAddTask = (state) => state.app.displayInput;
 
 

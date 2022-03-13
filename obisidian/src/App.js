@@ -1,9 +1,19 @@
-import React from "react";
+import React, {useEffect} from "react";
 import logo from "./logo.svg";
 import "./App.css";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import {
+	BrowserRouter as Router,
+	Switch,
+	Route,
+	Link,
+	useHistory,
+} from "react-router-dom";
 import styled from "styled-components";
 
+import { useSelector } from "react-redux";
+import { selectProjectId, selectProjectName } from "./features/appSlice";
+
+import NoMatch from "./Tasks/components/NoMatch";
 import Header from "./Interface/components/Header";
 import Sidebar from "./Interface/components/Sidebar";
 import Homepage from "./Tasks/components/Homepage";
@@ -16,6 +26,15 @@ import Spinner from "react-spinkit";
 
 function App() {
 	const [user, loading] = useAuthState(auth);
+	const projectId = useSelector(selectProjectId);
+	const title = useSelector(selectProjectName);
+
+	const history = useHistory();
+
+	useEffect(() => {
+		console.log('Router ids: ', projectId, title)
+	})
+
 	if (loading) {
 		return (
 			<AppLoading>
@@ -31,26 +50,25 @@ function App() {
 	}
 	return (
 		<div className='app'>
-			<Router>
-				{!user ? (
-					<Login />
-				) : (
-					<>
-						<Header />
-						<AppBody>
-							<Sidebar />
-							<Switch>
-								<Route exact path='/'>
-									<Homepage />
-								</Route>
-								<Route exact path='/my-tasks'>
-									<MyTasks />
-								</Route>
-							</Switch>
-							<Chat />
-						</AppBody>
-					</>
-				)}
+			<Router history={history}>
+				<>
+					<Header />
+					<AppBody>
+						<Sidebar />
+						<Switch>
+							<Route exact path='/'>
+								<Homepage />
+							</Route>
+							<Route exact path={`/${projectId}/project/${title}`}>
+								<MyTasks />
+							</Route>
+							<Route exact path="*">
+								<NoMatch />
+							</Route>
+						</Switch>
+						<Chat />
+					</AppBody>
+				</>
 			</Router>
 		</div>
 	);
