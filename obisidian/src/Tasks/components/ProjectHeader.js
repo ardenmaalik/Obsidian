@@ -7,26 +7,19 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import StarBorderOutlinedIcon from "@mui/icons-material/StarBorderOutlined";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 
-const MyTasksHeader = ({sortData, displayNewTask, setDisplayNewTask}) => {
+const ProjectHeader = ({name, sortData, addEmptyTaskValue}) => {
 	const [displayDropdown, setDisplayDropdown] = useState(null);
 
-	useEffect(() => {
-		document.addEventListener("click", handleClickOutside, true);
+	// const handleClickOutside = () => {
+	// 	setDisplayDropdown(false);
+	// };
 
-		return () => {
-			document.removeEventListener("click", handleClickOutside, true);
-		};
-	});
-
-	const handleClickOutside = () => {
-		setDisplayDropdown(false);
-	};
 
 	return (
 		<MyTasksHeaderContainer>
 			<Header>
 				<HeaderLeft>
-					<span>Project Name</span>
+					<span>{name}</span>
 					<ExpandMoreIcon />
 					<InfoOutlinedIcon />
 					<StarBorderOutlinedIcon />
@@ -37,8 +30,7 @@ const MyTasksHeader = ({sortData, displayNewTask, setDisplayNewTask}) => {
 			<SubHeaderContainer>
 				<SubHeaderLeft>
 					<AddTaskButton
-						displayNewTask={displayNewTask}
-						setDisplayNewTask={setDisplayNewTask}
+						addEmptyTaskValue={addEmptyTaskValue}
 					/>
 				</SubHeaderLeft>
 				<SubHeaderRight>
@@ -66,7 +58,7 @@ const MyTasksHeader = ({sortData, displayNewTask, setDisplayNewTask}) => {
 	);
 };
 
-export default MyTasksHeader;
+export default ProjectHeader;
 
 const Header = styled.div`
 	padding: 1em;

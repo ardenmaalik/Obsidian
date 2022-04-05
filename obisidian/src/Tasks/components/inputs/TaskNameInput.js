@@ -1,42 +1,58 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
+import { useSelector } from "react-redux";
 import styled from "styled-components";
+import { selectProjectId } from "../../../features/appSlice";
 
-function TaskNameInput({
+const TaskNameInput = ({
+	id,
 	index,
 	field,
 	val,
+	isSelected,
 	handleInputOnChange,
-	handleOnFocus,
-	handleOnBlur,
-}) {
+	updateData,
+	displayNewTask,
+	filterOutEmptyTasks,
+	data,
+}) => {
+	const projectId = useSelector(selectProjectId);
+	const inputRef = useRef();
+
+	useEffect(() => {
+		if (displayNewTask) {
+			if (isSelected.index === null) {
+				index === 0 && inputRef.current.focus();
+			}
+		}
+	}, [displayNewTask]);
+
+	const onBlur = async (index, id, val) => {
+		updateData(index, id, val);
+	};
+
+	const onKeyDown = (e) => {
+		e.key === "Enter" && inputRef.current.blur();
+	};
+
+	// const handleOnKeyDown = () => {
+
+	// }
+
 	return (
-		<TaskNameContainer>
-			<input
-				name={field}
-				type='text'
-				onChange={(e) => handleInputOnChange(e, index, field)}
-				placeholder={"Write a task name"}
-				value={val}
-				onFocus={() => handleOnFocus(index, field)}
-				onBlur={() => handleOnBlur()}
-			/>
-		</TaskNameContainer>
+		<input
+			ref={inputRef}
+			name={field}
+			type='text'
+			onChange={(e) => handleInputOnChange(e)}
+			placeholder={"Write a task name"}
+			value={val}
+			onBlur={() => onBlur(index, id, val)}
+			onKeyDown={onKeyDown}
+			className={"cell"}
+			autoFocus={id === 0 && true}
+			// OnKeyDown={() => handleOnKeyDown()}
+		/>
 	);
-}
+};
 
 export default TaskNameInput;
-
-const TaskNameContainer = styled.div`
-	input {
-		border: none;
-		outline: none;
-		width: ${({ isActive }) => isActive && "98%"};
-		height: 25px;
-		font-size: 12px;
-		color: #3a3b3c;
-	}
-
-	input:focus {
-		border: 1px solid black;
-	}
-`;

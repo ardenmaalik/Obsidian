@@ -1,177 +1,204 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import styled from "styled-components";
-import DataHeader from "./DataHeader";
-import DataCell from "./DataCell";
+import React, {
+	useState,
+	useEffect,
+	useRef,
+	useMemo,
+	useCallback,
+} from "react";
+import { useSelector} from "react-redux";
+import { useVirtual } from "react-virtual";
 
-// import DataCell from './DataCell';
+import {
+	useTable,
+	useResizeColumns,
+	useFlexLayout,
+	useRowSelect,
+	useSortBy,
+} from "react-table";
 
-import { selectAddTask } from "../../features/appSlice";
+import Row from "./Row";
+import EditableCell from "./EditableCell";
 
 const Table = ({
-	data,
-	dataState,
-	setDataState,
+	records,
 	columns,
-	sortData,
-	isSorted,
-	setIsSorted,
+	data,
 	displayNewTask,
-	setDisplayNewTask,
+	setIsSelected,
+	isSelected,
+	updateData,
+	filterOutEmptyTasks
 }) => {
-	const [isRowSelected, setIsRowSelected] = useState("");
-	const [isSelected, setIsSelected] = useState({ index: null, field: "" });
-	const [editDate, setEditDate] = useState(false);
-	const [assigneeInput, showAssigneeInput] = useState(false);
 
-	const dataRef = useRef();
+	const [columnDimensions, setColumnDimensions] = useState([]);
+	const columnHeadersRef = useRef([]);
+
+	const {
+		getTableProps,
+		getTableBodyProps,
+		headerGroups,
+		rows,
+		prepareRow,
+		state,
+	} = useTable(
+		{
+			columns,
+			data,
+			updateData,
+			isSelected,
+			setIsSelected,
+			displayNewTask,
+			filterOutEmptyTasks
+		},
+		useSortBy,
+		useResizeColumns,
+		useFlexLayout,
+		useRowSelect
+	);
+
+	useEffect(() => {
+		console.log("Rows: ", rows);
+		console.log('Columns: ', columns)
+	}, []);
+
+	const headerProps = (props, { column }) => getStyles(props, column.align);
+
+	const getStyles = (props, align = "left") => [
+		props,
+		{
+			style: {
+				justifyContent: align === "right" ? "flex-end" : "flex-start",
+				alignItems: "flex-start",
+				display: "flex",
+			},
+		},
+	];
+
+	const parentRef = useRef();
+
+	const { totalSize, virtualItems } = useVirtual({
+		size: rows.length,
+		overscan: 50,
+		parentRef,
+		estimateSize: useCallback(() => 35, []),
+		keyExtractor: useCallback((index) => rows[index].id, [rows]),
+	});
+
+	const columnResizingWidths = state.columnResizing.columnWidths;
+	const { columnOrder } = state;
+
+	const getColumnDimensions = useCallback(() => {
+		const widths = columnHeadersRef.current
+			?.filter((colEl) => !!colEl)
+			.map((colEl) => colEl.offsetWidth);
+
+		const dimensions = columnHeadersRef.current?.map((colEl, idx) => ({
+			width: widths[idx],
+			left: widths.reduce(
+				(acc, colWidth, colWidthIdx) =>
+					colWidthIdx < idx ? acc + colWidth : acc,
+				0
+			),
+			right: widths.reduce(
+				(acc, colWidth, colWidthIdx) =>
+					colWidthIdx > idx ? acc + colWidth - 1 : acc,
+				0
+			),
+		}));
+
+		return dimensions;
+	}, [columnHeadersRef]);
+
+	useEffect(() => {
+		setColumnDimensions(getColumnDimensions);
+	}, [getColumnDimensions, columnResizingWidths, columnOrder]);
 
 	useEffect(() => {
 		console.log();
 		if (displayNewTask) {
-			addEmptyTaskValue();
+			// addEmptyTaskValue();
 		} else {
 			return null;
 		}
 	}, [displayNewTask]);
 
 	useEffect(() => {
-		document.addEventListener("click", handleClickOutside);
-		return () => {
-			document.removeEventListener("click", handleClickOutside);
-		};
-	});
-
-	const handleClickOutside = (e) => {
-		if (displayNewTask) {
-			if (
-				e.target.parentNode !==
-					dataRef.current.children[1].children[0].children[0] ||
-				!dataRef.current.children[1].children[0].contains(e.target.parentNode)//Fix this line
-			) {
-				const dataMap = [...dataState];
-				const filteredData = dataMap.filter((item) => item.task_name !== "");
-
-				setDataState([...filteredData]);
-				setDisplayNewTask(false);
-			}
-		}
-
-		// console.log("Filtered: ", filteredData);
-	};
-
-	const addEmptyTaskValue = () => {
-		const newValue = {
-			id: 0,
-			task_name: "",
-			assignee: "",
-			due_date: "01/01/2001",
-			field: null,
-		};
-
-		setDataState((prevState) => [newValue, ...prevState]);
-	};
-
-	const columnWidth = (key) => {
-		const colWidth = columns.map((column) => {
-			if (key === column.field) {
-				return column.width;
-			}
-		});
-
-		const filteredColWidth = colWidth.filter((width) => {
-			return width !== undefined;
-		});
-
-		return filteredColWidth;
-	};
-
-	const handleRowOnClick = (index) => {
-		setIsRowSelected(index);
-	};
+		console.log("records: ", records);
+	},[]);
 
 	return (
-		<DataContainer ref={dataRef}>
-			<DataHeaderContainer>
-				{columns.map((header, i) => (
-					<DataHeader
-						headerWidth={header.width}
-						header={header}
-						index={i}
-						isSorted={isSorted}
-						setIsSorted={setIsSorted}
-						sortData={sortData}
-					/>
-				))}
-			</DataHeaderContainer>
-			<>
-				{data.map((row, index) => (
-					<DataRow
-						id={`${"row_" + index}`}
-						selectedRow={isRowSelected === index ? true : false}
-						onClick={(e) => handleRowOnClick(index)}
+		<>
+			<div {...getTableProps()} className='table'>
+				<div>
+					{headerGroups.map((headerGroup) => (
+						<div {...headerGroup.getHeaderGroupProps()} className='tr'>
+							{headerGroup.headers.map((column, i) => (
+								<div
+									{...column.getSortByToggleProps()}
+									{...column.getHeaderProps(headerProps)}
+									ref={(ref) => {
+										columnHeadersRef.current[i] = ref;
+									}}
+									className={`th${column.canSort ? ` sortable` : ``}`}
+								>
+									{column.render("Header")}
+									<span>
+										{column.isSorted
+											? column.isSortedDesc
+												? " 🔽"
+												: " 🔼"
+											: ""}
+									</span>
+									{i === headerGroup.headers.length - 1 ? (
+										column.canResize === false
+									) : column.canResize ? (
+										<div
+											onClick={(e) => e.stopPropagation()}
+											{...column.getResizerProps()}
+											className={`resizer ${
+												column.isResizing ? "isResizing" : ""
+											}`}
+										/>
+									) : (
+										""
+									)}
+								</div>
+								// console.log('COLUMN: ', column)
+							))}
+						</div>
+					))}
+				</div>
+				<div
+					ref={parentRef}
+					className='List'
+					style={{
+						width: `100%`,
+						overflow: "auto",
+						flex: "1",
+					}}
+				>
+					<div
+						{...getTableBodyProps()}
+						style={{
+							height: `${totalSize}px`,
+							width: "100%",
+							position: "relative",
+							display: "flex",
+						}}
 					>
-						{Object.entries(row, index).map(
-							([key, val]) =>
-								key !== "id" && (
-									<DataCell
-										field={key}
-										val={val}
-										index={index}
-										dataState={dataState}
-										setDataState={setDataState}
-										columnWidth={columnWidth(key)}
-										setIsSelected={setIsSelected}
-										isSelected={isSelected}
-										displayNewTask={displayNewTask}
-										setDisplayNewTask={setDisplayNewTask}
-										handleClickOutside={handleClickOutside}
-										editDate={editDate}
-										setEditDate={setEditDate}
-										assigneeInput={assigneeInput}
-										showAssigneeInput={showAssigneeInput}
-									/>
-								)
-						)}
-					</DataRow>
-				))}
-			</>
-		</DataContainer>
+						{virtualItems.map((virtualRow) => (
+							<Row
+								virtualRow={virtualRow}
+								key={virtualRow.key}
+								rows={rows}
+								prepareRow={prepareRow}
+							/>
+						))}
+					</div>
+				</div>
+			</div>
+		</>
 	);
 };
 
 export default Table;
-
-const DataContainer = styled.div`
-	display: grid;
-	width: 100%;
-	border-top: 1px solid #ddd;
-	grid-template-columns:
-		350px
-		150px
-		150px
-		minmax(150px, 1.67fr);
-`;
-
-const DataRow = styled.div`
-	display: contents;
-	height: 30px;
-	align-items: center;
-	font-size: 12px;
-	cursor: pointer;
-
-	> div {
-		background-color: ${({ selectedRow }) =>
-			selectedRow ? "#ADD8E6" : "white"};
-	}
-
-	:hover div {
-		background-color: ${({ selectedRow }) =>
-			selectedRow ? "none" : "#F5F5F5"};
-	}
-`;
-
-const DataHeaderContainer = styled.div`
-	display: contents;
-	cursor: pointer;
-`;

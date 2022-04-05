@@ -18,7 +18,7 @@ import Header from "./Interface/components/Header";
 import Sidebar from "./Interface/components/Sidebar";
 import Homepage from "./Tasks/components/Homepage";
 import Chat from "./Chat/components/Chat";
-import MyTasks from "./Tasks/components/MyTasks";
+import ProjectPage from "./Tasks/components/ProjectPage";
 import Login from "./Chat/components/Login";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "./firebase";
@@ -60,7 +60,7 @@ function App() {
 								<Homepage />
 							</Route>
 							<Route exact path={`/${projectId}/project/${title}`}>
-								<MyTasks />
+								<ProjectPage/>
 							</Route>
 							<Route exact path="*">
 								<NoMatch />

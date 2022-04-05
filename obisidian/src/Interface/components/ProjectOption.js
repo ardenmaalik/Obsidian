@@ -20,7 +20,8 @@ function ProjectOption({ title, id }) {
     }
 }
 
-const handleOnClick = () => {
+    const handleOnClick = () => {
+    
     selectProject()
     history.push(`/${id}/project/${title}`);
 

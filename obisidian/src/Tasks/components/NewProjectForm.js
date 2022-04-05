@@ -2,17 +2,21 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { selectProjectId, openProject } from "../../features/appSlice";
 import {
+	doc,
 	getFirestore,
 	query,
 	addDoc,
 	getDocs,
 	collection,
 	onSnapshot,
+	writeBatch,
+	getDoc,
 } from "firebase/firestore";
 import { db } from "../../firebase";
-
 import { firebaseApp } from "../../firebase";
 import { useCollection } from "react-firebase-hooks/firestore";
+
+import { COLUMNS as columns } from "./columns.js";
 
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
@@ -20,6 +24,7 @@ import { useForm } from "react-hook-form";
 import AddTaskIcon from "@mui/icons-material/AddTask";
 import ChatIcon from "@mui/icons-material/Chat";
 import GroupIcon from "@mui/icons-material/Group";
+import { batch } from "react-redux";
 
 const NewProjectForm = ({ activeModal }) => {
 	const [display, setDisplay] = useState(false);
@@ -32,6 +37,8 @@ const NewProjectForm = ({ activeModal }) => {
 		collection(getFirestore(firebaseApp), "projects")
 	);
 	const projectId = useSelector(selectProjectId);
+
+	const batch = writeBatch(db);
 
 	let history = useHistory();
 	let dispatch = useDispatch();
@@ -54,53 +61,53 @@ const NewProjectForm = ({ activeModal }) => {
 		if (projectCreated) {
 			history.push(`/${projectId}/project/${projectData.projectName}`);
 		}
-		setProjectCreated(false)
+		setProjectCreated(false);
 	}, [projectCreated]);
 
 	useEffect(() => {
 		activeModal && setDisplay(true);
 	}, [activeModal]);
 
-	const addProject = async () => {
-		console.log('adding project...')
-		const projectName = projectData.projectName;
-		if (projectName) {
-			try {
-				//await til this is finished
-				await addDoc(collection(db, "projects"), {
-					name: projectName,
-				});
-			} catch (e) {
-				console.error("Error adding project: ", e);
-			}
+	const createProjectDoc = async () => {
+		try {
+			await addDoc(collection(db, "projects"), {
+				name: projectData.projectName,
+			});
+
+			// await createColumns();
+		} catch (err) {
+			console.error("Error adding project: ", err);
 		}
 	};
 
-	const createProject = async () => {
-		await addProject();
-		await getProjectId();
-		setProjectCreated(true)
-	};
-
-	const getProjectId = async () => {
-		console.log('getting project id...')
-		const q = query(collection(db, "projects"));
-		const queryProjects = await getDocs(q);
-
-		await queryProjects.forEach((doc) => {
-			if (doc.data().name === projectData.projectName)
-				dispatch(
-					openProject({
-						projectId: doc.id,
-						projectName: projectData.projectName
-					})
-				);
-		});
-	};
+	// const createColumns = async () => {
+	// 	const q = query(collection(db, "projects"));
+	// 	const queryProjects = await getDocs(q);
+	// 	const filter = columns.forEach((column) => {
+	// 		if (column.Cell) {
+	// 			console.log('match')
+	// 		}
+	// 	})
+	// 	if (queryProjects) {
+	// 		try {
+	// 			await queryProjects.forEach((doc) => {
+	// 				if (doc.data().name === projectData.projectName) {
+	// 					for (let i = 0; i < columns.length; i++) {
+	// 						let data = columns[i];
+	// 						console.log(data);
+	// 						addDoc(collection(db, "projects", doc.id, "columns"), data);
+	// 					}
+	// 				}
+	// 			});
+	// 		} catch (err) {
+	// 			console.err("Could not create columns", err);
+	// 		}
+	// 	}
+	// };
 
 	const handleGoToProject = async () => {
 		if (activeTab === "add-task") {
-			createProject();
+			createProjectDoc();
 		}
 	};
 
@@ -184,7 +191,7 @@ const NewProjectForm = ({ activeModal }) => {
 						type='submit'
 						value='Go to Project'
 						onClick={handleGoToProject}
-						/>
+					/>
 				</OptionsContainer>
 			)}
 		</NewProjectFormContainer>

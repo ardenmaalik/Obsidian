@@ -1,74 +1,10 @@
 [
 	{
-		"id": 1,
-		"task_name": "Hello, world!",
-		"assignee": "Ravid Port",
-		"due_date": "2022/03/02",
-        "field": null
-	},
-	{
-		"id": 2,
-		"task_name": "Is this working?",
-		"assignee": "Ham Linfitt",
-		"due_date": "2022/05/09",
-        "field": null
-
-	},
-	{
-		"id": 3,
-		"task_name": "DEFI LEGEND",
-		"assignee": "Liam Nelson",
-		"due_date": "2022/10/03",
-        "field": null
-
-	},
-	{
-		"id": 4,
-		"task_name": "Task dashboard w/ slack",
-		"assignee": "Hababo Olana",
-		"due_date": "2022/08/05",
-		"field": null
-	},
-	{
-		"id": 5,
-		"task_name": "We love React!",
-		"assignee": "Arden Maalik",
-		"due_date": "2022/07/08",
-		"field": null
-	},
-	{
-		"id": 6,
-		"task_name": "Don't forget to commit!",
-		"assignee": "Arden Maalik",
-		"due_date": "2022/07/12",
-		"field": null
-	},
-	{
-		"id": 7,
-		"task_name": "This is a long task to see how it fares during resizing...",
-		"assignee": "Hababo Olana",
-		"due_date": "2022/10/08",
-		"field": null
-	},
-	{
-		"id": 8,
-		"task_name": "This project is pretty tedious",
-		"assignee": "Liam Nelson",
-		"due_date": "2022/12/12",
-		"field": null
-	},
-	{
-		"id": 9,
-		"task_name": "Hopefully, this lands me a good role",
-		"assignee": "Arden Maalik",
-		"due_date": "2022/03/01",
-		"field": null
-	},
-	{
-		"id": 10,
-		"task_name": "Tech is the future",
-		"assignee": "Ham Linfitt",
-		"due_date": "2022/07/08",
-		"field": null
+		"id": 0,
+		"task_name": "Add a new task...",
+		"assignee": "",
+		"due_date": "",
+        "field": null,
+		"section": null
 	}
 ]
