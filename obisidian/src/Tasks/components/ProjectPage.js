@@ -18,7 +18,7 @@ import {
 	addRow,
 	fetchRecords,
 } from "../../features/appSlice";
-import { createNewDoc, deleteRow} from "./dataFuncs";
+import { createNewDoc, deleteRow } from "./dataFuncs";
 import { COLUMNS } from "./columns";
 import { db } from "../../firebase";
 import { updateDoc, doc } from "@firebase/firestore";
@@ -71,19 +71,13 @@ function ProjectPage() {
 		setColumnState(colArr);
 	};
 
-	const filterOutEmptyTasks = () => {
+	const filterOutEmptyTasks = (id) => {
 		const DATA = [...data];
 		console.log("filtering...: ", DATA);
 		setDisplayNewTask(false);
-		const filterData = DATA.filter((row) => row.task_name === "");
-		console.log("filter: ", filterData, filterData[0].id, filterData[0].order);
-		deleteRow(projectId, ...filterData)
-		// setIsUpdating((prev) => !prev);
-		// dispatch(
-		// 	deleteRow({
-		// 		data: filterData,
-		// 	})
-		// );
+		const filterData = DATA.filter((row) => row.id === id);
+		console.log("filter: ", filterData, id);
+		deleteRow(projectId, ...filterData);
 	};
 
 	const updateData = async (rowIndex, columnId, value) => {
@@ -94,15 +88,21 @@ function ProjectPage() {
 		// setSkipPageReset(true);
 		await DATA.map((row, index) => {
 			if (index === rowIndex) {
+				if (columnId === 'task_name' && !value.length) {
+					filterOutEmptyTasks(row.id)
+				}
 				updateDoc(doc(db, "projects", projectId, "data", row.id), {
 					[columnId]: value,
 				});
+
 			}
-    });
-    
-    if (columnId === "task_name" && value.length === 0) {
-      filterOutEmptyTasks()
-    } 
+		});
+
+		
+		if (columnId === "task_name" && value.length === 0) {
+			console.log("call filter");
+			filterOutEmptyTasks();
+		}
 	};
 
 	const addEmptyTaskValue = async () => {
@@ -110,8 +110,8 @@ function ProjectPage() {
 			task_name: "",
 			assignee: "",
 			due_date: "",
-      custom: null,
-      order: isSelected.index !== null ? isSelected.index + 1 : 0
+			custom: null,
+			order: isSelected.index !== null ? isSelected.index + 1 : 0,
 		};
 
 		setDisplayNewTask((prev) => !prev);
@@ -235,7 +235,8 @@ const Styles = styled.div`
 			}
 		}
 
-		.td.assignee, .td.due_date {
+		.td.assignee,
+		.td.due_date {
 			padding: 0;
 			input {
 				box-sizing: border-box;

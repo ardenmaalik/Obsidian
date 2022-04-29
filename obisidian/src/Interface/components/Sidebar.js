@@ -5,19 +5,17 @@ import { getFirestore, collection } from "firebase/firestore";
 import { firebaseApp } from "../../firebase";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
-import {auth} from '../../firebase'
+import { auth } from "../../firebase";
 
-import ProjectList from './ProjectList'
+import ProjectList from "./ProjectList";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import CreateIcon from "@mui/icons-material/Create";
-
-
 
 function Sidebar() {
 	const [channels, loading, error] = useCollection(
 		collection(getFirestore(firebaseApp), "rooms")
 	);
-	const [projects] = useCollection(collection(getFirestore(firebaseApp), "projects"));
+	
 	const [user] = useAuthState(auth);
 
 	return (
@@ -32,9 +30,7 @@ function Sidebar() {
 				</SidebarInfo>
 				<CreateIcon />
 			</SidebarHeader>
-
-			<SidebarOptionList channels={channels} />
-			<ProjectList projects={projects}/>
+				<SidebarOptionList channels={channels} />
 		</SidebarContainer>
 	);
 }
@@ -46,7 +42,7 @@ const SidebarContainer = styled.div`
 	background-color: var(--obsidian-color);
 	flex: 0.3;
 	border-top: 1px solid #49274b;
-	max-width: 260px;
+	max-width: 300px;
 	margin-top: 60px;
 
 	> hr {
@@ -92,3 +88,7 @@ const SidebarInfo = styled.div`
         color: green;
     }
 `;
+
+const SidebarContent = styled.div`
+	display: flex;
+`

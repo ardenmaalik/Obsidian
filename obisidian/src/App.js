@@ -15,10 +15,12 @@ import { selectProjectId, selectProjectName } from "./features/appSlice";
 
 import NoMatch from "./Tasks/components/NoMatch";
 import Header from "./Interface/components/Header";
+import ProjectSidebar from "./Interface/components/ProjectSidebar";
 import Sidebar from "./Interface/components/Sidebar";
 import Homepage from "./Tasks/components/Homepage";
 import Chat from "./Chat/components/Chat";
-import ProjectPage from "./Tasks/components/ProjectPage";
+import ProjectPage from "./Project/components/ProjectPage";
+import ProjectOverview from "./Project/components/ProjectPage";
 import Login from "./Chat/components/Login";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "./firebase";
@@ -54,6 +56,7 @@ function App() {
 				<>
 					<Header />
 					<AppBody>
+						<ProjectSidebar/>
 						<Sidebar />
 						<Switch>
 							<Route exact path='/'>

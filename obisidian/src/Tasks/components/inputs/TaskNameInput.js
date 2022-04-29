@@ -27,6 +27,7 @@ const TaskNameInput = ({
 	}, [displayNewTask]);
 
 	const onBlur = async (index, id, val) => {
+		console.log('blurred: ', val)
 		updateData(index, id, val);
 	};
 

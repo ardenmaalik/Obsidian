@@ -16,7 +16,7 @@ import AddIcon from "@mui/icons-material/Add";
 function SidebarOptionList({channels}) {
     return (
         <SidebarOptionListContainer>
-            <SidebarOption Icon={InsertCommentIcon} title='Threads' />
+            <SidebarOption Icon={InsertCommentIcon} title='Overview' />
 			<SidebarOption Icon={InboxIcon} title='Mentions & reactions' />
 			<SidebarOption Icon={DraftsIcon} title='Saved items' />
 			<SidebarOption Icon={BookmarkBorderIcon} title='My Tasks' />
@@ -25,9 +25,9 @@ function SidebarOptionList({channels}) {
 			<SidebarOption Icon={FileCopyIcon} title='File browser' />
 			<SidebarOption Icon={ExpandLessIcon} title='Show less' />
 			<hr />
-			<SidebarOption Icon={ExpandMoreIcon} title='Channels' />
+			<SidebarOption Icon={ExpandMoreIcon} title='Direct Messages' />
 			<hr />
-			<SidebarOption Icon={AddIcon} addChannelOption title='Add Channel' />
+			{/* <SidebarOption Icon={AddIcon} addChannelOption title='Add Channel' /> */}
 
 			{channels?.docs.map((doc) => (
 				<SidebarOption key={doc.id} id={doc.id} title={doc.data().name} />

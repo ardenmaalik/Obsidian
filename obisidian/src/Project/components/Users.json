@@ -1,0 +1,27 @@
+[
+	{
+		"name": "Sumo",
+		"role": "Project Owner",
+		"image": "/src/assets/user-img.png"
+	},
+	{
+		"name": "Arden",
+		"role": "Software Developer",
+		"image": "../../assets/user-img.png"
+	},
+	{
+		"name": "Hababo Olana",
+		"role": "Senior Underwriter",
+		"image": "../../assets/user-img.png"
+	},
+	{
+		"name": "Kathy Cox",
+		"role": "Senior Communications Specialist",
+		"image": "../../assets/user-img.png"
+	},
+	{
+		"name": "Andy Lee",
+		"role": "Photographer",
+		"image": "../../assets/user-img.png"
+	}
+]

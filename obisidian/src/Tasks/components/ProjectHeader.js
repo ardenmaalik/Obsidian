@@ -2,12 +2,9 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 
 import AddTaskButton from "./AddTaskButton";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import StarBorderOutlinedIcon from "@mui/icons-material/StarBorderOutlined";
-import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 
-const ProjectHeader = ({name, sortData, addEmptyTaskValue}) => {
+
+const ProjectHeader = ({sortData, addEmptyTaskValue}) => {
 	const [displayDropdown, setDisplayDropdown] = useState(null);
 
 	// const handleClickOutside = () => {
@@ -17,16 +14,6 @@ const ProjectHeader = ({name, sortData, addEmptyTaskValue}) => {
 
 	return (
 		<MyTasksHeaderContainer>
-			<Header>
-				<HeaderLeft>
-					<span>{name}</span>
-					<ExpandMoreIcon />
-					<InfoOutlinedIcon />
-					<StarBorderOutlinedIcon />
-					<FiberManualRecordIcon />
-					<p>Set status</p>
-				</HeaderLeft>
-			</Header>
 			<SubHeaderContainer>
 				<SubHeaderLeft>
 					<AddTaskButton
@@ -60,9 +47,6 @@ const ProjectHeader = ({name, sortData, addEmptyTaskValue}) => {
 
 export default ProjectHeader;
 
-const Header = styled.div`
-	padding: 1em;
-`;
 
 const MyTasksHeaderContainer = styled.div`
 	display: flex;
@@ -98,23 +82,6 @@ const SubHeaderRight = styled.div`
 
 const SubHeaderLeft = styled.div`
 	margin-left: 1em;
-`;
-
-const HeaderLeft = styled.div`
-	display: flex;
-	width: 100%;
-	margin-left: 1em;
-
-	span {
-		font-size: 20px;
-		font-weight: 600;
-	}
-
-	> .MuiSvgIcon-root {
-		font-size: 20px;
-		margin-right: 5px;
-		color: #90949c;
-	}
 `;
 
 const SortButtonContainer = styled.div`

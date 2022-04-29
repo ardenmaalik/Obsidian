@@ -40,10 +40,17 @@ export default ProjectOption
 
 const ProjectOptionContainer = styled.div`
 	display: flex;
+    justify-content: center;
+    align-items: center;
 	font-size: 12px;
 	align-items: center;
 	padding-left: 2px;
 	cursor: pointer;
+    background-color: turquoise;
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    margin-bottom: 1rem;
 
 	:hover {
 		opacity: 0.9;
